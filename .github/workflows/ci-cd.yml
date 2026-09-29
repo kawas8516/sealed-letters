@@ -1,0 +1,40 @@
+# Runs on every push and pull request: lint, typecheck, text check, build.
+# Deployment is handled by the Vercel / Netlify Git integration (connected in
+# their dashboards), which builds and deploys on its own after pushes to main
+# and on pull requests. This workflow gates merges on a green build.
+
+name: CI / CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, typecheck, verify text, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      # The letter must match its source word for word.
+      - run: npm run verify:text
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1

@@ -1,0 +1,803 @@
+@import "tailwindcss";
+
+:root {
+  /* Desk */
+  --desk: #1f1914;
+  --desk-deep: #120e0b;
+  --lamp: rgba(255, 214, 160, 0.13);
+  --caption: rgba(236, 222, 198, 0.42);
+
+  /* Paper */
+  --paper: #f3ecdd;
+  --paper-warm: #efe5d2;
+  --paper-edge: #e2d6bf;
+  --paper-back: #ece3d1;
+
+  /* Ink: deep royal-blue fountain-pen ink */
+  --ink: #1c3689;
+  --ink-wet: #172d78;
+
+  --paper-w: clamp(
+    300px,
+    min(92vw, calc((100svh - 7.5rem) * 203 / 254)),
+    720px
+  );
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--desk-deep);
+  color: var(--caption);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(28, 54, 137, 0.16);
+}
+
+/* ---------------------------------------------------------------- Desk */
+
+.desk {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background-color: var(--desk);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+.desk__surface,
+.desk__grain,
+.desk__light,
+.desk__falloff {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Dark oiled walnut: long, soft figure, never a visible repeat. */
+.desk__surface {
+  background: linear-gradient(180deg, #241d17 0%, #1e1813 55%, #19140f 100%);
+}
+
+.desk__grain {
+  opacity: 0.5;
+  mix-blend-mode: soft-light;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1800' height='1100' preserveAspectRatio='none'><filter id='g' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.0009 0.028' numOctaves='5' seed='7'/><feColorMatrix values='0 0 0 0 0.8  0 0 0 0 0.62  0 0 0 0 0.44  0 0 0 1.1 -0.1'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 100% 100%, 256px 256px;
+}
+
+/* A lamp somewhere above and to the left; the room falls away at the edges. */
+.desk__light {
+  background:
+    radial-gradient(ellipse 60% 55% at 44% 40%, var(--lamp), transparent 70%),
+    radial-gradient(ellipse 120% 95% at 50% 45%, transparent 45%, rgba(6, 4, 3, 0.62) 100%);
+}
+
+/* The lamp's reach, laid over everything on the desk, paper included. */
+.desk__falloff {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 58% 78% at 52% 46%,
+    transparent 52%,
+    rgba(12, 8, 5, 0.18) 72%,
+    rgba(8, 5, 3, 0.5) 100%
+  );
+}
+
+.desk__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  text-align: center;
+  font-family: var(--font-caption), Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--caption);
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+/* The hint borrows the caption's place while it is showing. */
+.desk:has(.hint) .desk__caption {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- Letter */
+
+.letter {
+  position: relative;
+  width: var(--paper-w);
+  aspect-ratio: 203 / 254;
+  container-type: inline-size;
+  margin-bottom: 1.5rem;
+}
+
+.letter:focus-visible {
+  outline: none;
+}
+
+.letter:focus-visible .sheet--top {
+  box-shadow:
+    0 0 0 2px rgba(236, 222, 198, 0.35),
+    var(--sheet-shadow);
+}
+
+/* ---------------------------------------------------------------- Sheet */
+
+.sheet {
+  --sheet-shadow:
+    0 0.5px 0 rgba(255, 255, 255, 0.5) inset,
+    0 1px 1px rgba(10, 6, 3, 0.18),
+    0 3px 6px rgba(10, 6, 3, 0.16),
+    0 14px 30px -6px rgba(10, 6, 3, 0.45);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: var(--sheet-shadow);
+}
+
+/* Envelopes were never folded. */
+.paper.paper--plain {
+  --folds: linear-gradient(transparent, transparent);
+}
+
+.sheet--under {
+  box-shadow:
+    0 1px 1px rgba(10, 6, 3, 0.2),
+    0 4px 10px -2px rgba(10, 6, 3, 0.35);
+  background: var(--paper-edge);
+}
+
+.sheet--back {
+  background: var(--paper-back);
+}
+
+/* Paper: grain, fibres, uneven tone, handling at the edges, envelope folds. */
+.paper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --folds: linear-gradient(
+      180deg,
+      transparent calc(33.3% - 1.2cqw),
+      rgba(120, 95, 60, 0.035) calc(33.3% - 0.15cqw),
+      rgba(255, 255, 255, 0.18) 33.3%,
+      transparent calc(33.3% + 0.9cqw),
+      transparent calc(66.6% - 1.2cqw),
+      rgba(120, 95, 60, 0.03) calc(66.6% - 0.15cqw),
+      rgba(255, 255, 255, 0.16) 66.6%,
+      transparent calc(66.6% + 0.9cqw)
+    );
+  background-image:
+    /* folds at thirds: a faint valley and its lit shoulder */
+    var(--folds),
+    /* tone: a little warmer at the lower right where the hand rests */
+    radial-gradient(ellipse 80% 60% at var(--tone-x, 70%) var(--tone-y, 85%), rgba(214, 190, 150, 0.16), transparent 70%),
+    radial-gradient(ellipse 90% 70% at 20% 10%, rgba(255, 252, 244, 0.35), transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='3' seed='3'/><feColorMatrix values='0 0 0 0 0.62  0 0 0 0 0.5  0 0 0 0 0.33  0 0 0 0.16 0'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.3' numOctaves='2' seed='11'/><feColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.45  0 0 0 0 0.3  0 0 0 0.13 -0.02'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.4  0 0 0 0 0.32  0 0 0 0 0.22  0 0 0 0.13 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 100% 100%, 100% 100%, 100% 100%, 600px 600px, 400px 400px, 180px 180px;
+  background-position: 0 0, 0 0, 0 0, var(--grain-x, 0) var(--grain-y, 0), var(--grain-y, 0) var(--grain-x, 0), 0 0;
+  box-shadow:
+    inset 0 0 1.4cqw rgba(160, 130, 90, 0.12),
+    inset 0 0 0.25cqw rgba(140, 110, 70, 0.12);
+}
+
+/* ---------------------------------------------------------------- Ink */
+
+.writing {
+  position: absolute;
+  font-family: var(--font-hand), cursive;
+  color: var(--ink);
+  font-kerning: normal;
+  user-select: text;
+  -webkit-user-select: text;
+  transition: opacity 700ms ease;
+}
+
+.writing[data-ready="false"] {
+  opacity: 0;
+}
+
+/* The same class is used by the measurer, so metrics always agree. */
+.ink-body {
+  font-family: var(--font-hand), cursive;
+  letter-spacing: 0.005em;
+  word-spacing: 0.04em;
+}
+
+.ink-line {
+  display: block;
+  white-space: nowrap;
+  transform-origin: 0 70%;
+  /* Feathering: ink creeps a hair into the fibres. */
+  text-shadow:
+    0 0 0.035em rgba(28, 54, 137, 0.45),
+    0.01em 0.01em 0.02em rgba(23, 45, 120, 0.2);
+}
+
+.ink-date {
+  display: block;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ink-salutation {
+  display: block;
+  white-space: nowrap;
+}
+
+.ink-signature {
+  display: block;
+  font-family: var(--font-signature), cursive;
+  white-space: nowrap;
+  color: var(--ink-wet);
+}
+
+.ink-folio {
+  position: absolute;
+  font-family: var(--font-hand), cursive;
+  color: var(--ink);
+  opacity: 0.8;
+}
+
+/* Faint show-through of the ink on the back of a sheet. */
+.bleed {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
+  opacity: 0.045;
+  filter: blur(0.09cqw);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- Turn */
+
+.turn-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  perspective: 3200px;
+  perspective-origin: 0% 42%;
+  pointer-events: none;
+}
+
+.turn-root,
+.turn-seg {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: 0 50%;
+}
+
+.turn-root {
+  left: 0;
+  width: 100%;
+}
+
+.turn-seg {
+  /* Hairline overlap hides seams between strips. */
+  width: calc(var(--seg-w) + 2px);
+}
+
+.turn-seg .turn-seg {
+  left: var(--seg-w);
+}
+
+.turn-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.turn-face--back {
+  transform: rotateY(180deg);
+}
+
+.turn-canvas {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: calc(100cqw);
+}
+
+.turn-canvas > .sheet {
+  box-shadow: none;
+}
+
+.turn-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cast-shadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---------------------------------------------------------------- Hint */
+
+.hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  text-align: center;
+  font-family: var(--font-caption), Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  letter-spacing: 0.015em;
+  color: rgba(240, 228, 206, 0.72);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 520px) {
+  .desk__caption {
+    font-size: 0.82rem;
+  }
+  .hint {
+    font-size: 0.92rem;
+  }
+}
+
+.ink-folio[data-ready="false"] {
+  opacity: 0;
+}
+
+/* While sealed, the letter's box holds the envelope and nothing else. */
+.letter--sealed > :not(.letter__overlay) {
+  visibility: hidden;
+}
+
+.letter__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+}
+
+/* ---------------------------------------------------------------- Envelope */
+
+:root {
+  --envelope: #ede3cd;
+  --envelope-inside: #d8cab0;
+  --postmark: #2b2a33;
+}
+
+.envelope {
+  position: absolute;
+  perspective: 2400px;
+}
+
+.env-slide,
+.env-flipper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.env-side {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.env-side--back {
+  transform: rotateY(180deg);
+}
+
+.env-face {
+  position: absolute;
+  inset: 0;
+  background: var(--envelope);
+  /* Thickness: a letter inside and folded paper all round. */
+  box-shadow:
+    0 0.5px 0 rgba(255, 255, 255, 0.45) inset,
+    0 1px 1px rgba(10, 6, 3, 0.22),
+    0 2px 0 -1px #d9ccb2,
+    0 4px 8px rgba(10, 6, 3, 0.18),
+    0 16px 34px -8px rgba(10, 6, 3, 0.5);
+}
+
+.env-face--front {
+  overflow: hidden;
+}
+
+.env-face--back {
+  /* The letter is drawn up out of the top, so nothing is clipped here. */
+  overflow: visible;
+}
+
+.env-hit,
+.seal-hit {
+  position: absolute;
+  z-index: 7;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.env-hit {
+  inset: 0;
+}
+
+.seal-hit {
+  border-radius: 50%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.env-hit:focus-visible,
+.seal-hit:focus-visible {
+  outline: 2px solid rgba(240, 228, 206, 0.85);
+  outline-offset: 5px;
+}
+
+.seal-hit:focus-visible {
+  outline-offset: 3px;
+}
+
+/* Addresses: the same hand and ink as the letter. */
+.env-address {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-hand), cursive;
+  font-style: normal;
+  line-height: 1.55;
+  color: var(--ink);
+  text-shadow: 0 0 0.035em rgba(28, 54, 137, 0.45);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.env-address__label {
+  font-size: 0.72em;
+  opacity: 0.8;
+  margin-bottom: 0.05em;
+  transform: translateX(-0.6em) rotate(-1.5deg);
+}
+
+.env-address__line {
+  display: block;
+  transform-origin: 0 70%;
+}
+
+.env-address__name {
+  font-size: 1.12em;
+}
+
+/* Stamp: perforations cut with two nested masks, one per axis. */
+.stamps {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35cqw;
+}
+
+.stamp {
+  position: relative;
+  flex: 1 1 0;
+  filter: drop-shadow(0.12cqw 0.18cqw 0.12cqw rgba(40, 28, 16, 0.28));
+}
+
+.stamp__perf-y,
+.stamp__perf-x {
+  width: 100%;
+  height: 100%;
+}
+
+.stamp__perf-y {
+  --pitch: 0.95cqw;
+  --r: 0.26cqw;
+  mask:
+    radial-gradient(circle var(--r) at 50% 0, #0000 96%, #000) 50% 0 / var(--pitch) 51% repeat-x,
+    radial-gradient(circle var(--r) at 50% 100%, #0000 96%, #000) 50% 100% / var(--pitch) 51% repeat-x;
+}
+
+.stamp__perf-x {
+  --pitch: 0.95cqw;
+  --r: 0.26cqw;
+  overflow: hidden;
+  background: #f4f0e6;
+  mask:
+    radial-gradient(circle var(--r) at 0 50%, #0000 96%, #000) 0 50% / 51% var(--pitch) repeat-y,
+    radial-gradient(circle var(--r) at 100% 50%, #0000 96%, #000) 100% 50% / 51% var(--pitch) repeat-y;
+}
+
+.stamp__perf-x {
+  position: relative;
+}
+
+.stamp__image {
+  position: absolute;
+  display: block;
+  max-width: none;
+  /* Sized and offset inline (config `crop`) so the scan's own background
+     and perforations fall outside; ours are cut above. */
+  filter: saturate(0.88) contrast(0.96);
+  user-select: none;
+}
+
+.postmark {
+  position: absolute;
+  color: var(--postmark);
+  opacity: 0.62;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* The back. */
+.env-interior {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--envelope-inside);
+  box-shadow: inset 0 3cqw 4cqw -1cqw rgba(40, 26, 12, 0.35);
+}
+
+.env-contents {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 2600px;
+}
+
+.env-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.env-pocket__part {
+  position: absolute;
+  inset: 0;
+}
+
+.env-pocket__paper {
+  position: absolute;
+  inset: 0;
+  background: var(--envelope);
+}
+
+/* Each flap throws a hairline shadow onto what it overlaps. */
+.env-pocket__part--left {
+  filter: drop-shadow(0.12cqw 0 0.18cqw rgba(40, 26, 12, 0.2));
+}
+.env-pocket__part--left .env-pocket__paper {
+  clip-path: polygon(0 0, 45.2% 51.5%, 0 100%);
+}
+
+.env-pocket__part--right {
+  filter: drop-shadow(-0.12cqw 0 0.18cqw rgba(40, 26, 12, 0.2));
+}
+.env-pocket__part--right .env-pocket__paper {
+  clip-path: polygon(100% 0, 54.8% 51.5%, 100% 100%);
+}
+
+.env-pocket__part--bottom {
+  filter: drop-shadow(0 -0.15cqw 0.22cqw rgba(40, 26, 12, 0.22));
+}
+.env-pocket__part--bottom .env-pocket__paper {
+  clip-path: polygon(0 100%, 46.5% 45%, 48.5% 43.2%, 50% 42.8%, 51.5% 43.2%, 53.5% 45%, 100% 100%);
+}
+
+.env-flap-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.env-flap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 58.5%;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+}
+
+.env-flap__face {
+  position: absolute;
+  inset: 0;
+  background: var(--envelope);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  clip-path: polygon(0 0, 100% 0, 52.4% 96%, 50% 100%, 47.6% 96%);
+}
+
+.env-flap__face--inner {
+  background: var(--envelope-inside);
+  transform: rotateX(180deg);
+  clip-path: polygon(0 100%, 100% 100%, 52.4% 4%, 50% 0, 47.6% 4%);
+}
+
+.env-shade {
+  position: absolute;
+  inset: 0;
+  background: rgb(34, 24, 14);
+  pointer-events: none;
+}
+
+.seal-piece {
+  position: absolute;
+  pointer-events: none;
+}
+
+.seal-piece--upper {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Sits on the flap, which is only 58.5% of the envelope's height. */
+  z-index: 1;
+}
+
+.seal-piece--lower {
+  z-index: 6;
+}
+
+.wax-seal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0.3cqw 0.35cqw rgba(30, 6, 10, 0.42)) drop-shadow(0 0.06cqw 0.06cqw rgba(20, 4, 6, 0.5));
+}
+
+/* The folded letter. */
+.fold {
+  position: absolute;
+  left: 3cqw;
+  top: calc(-1 * (100cqw * 254 / 203 - 53cqw) / 2);
+  width: 100cqw;
+  aspect-ratio: 203 / 254;
+  transform-style: preserve-3d;
+}
+
+.fold__panel {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: calc(100cqw * 254 / 203 / 3);
+  transform-style: preserve-3d;
+}
+
+.fold__face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.fold__face--back {
+  transform: rotateX(180deg);
+}
+
+.fold__panel--middle {
+  overflow: hidden;
+}
+
+.fold__canvas {
+  position: absolute;
+  left: 0;
+  width: 100cqw;
+  aspect-ratio: 203 / 254;
+}
+
+.fold__canvas > .sheet {
+  box-shadow: none;
+}
+
+.fold__shadow {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    0 1px 1px rgba(10, 6, 3, 0.18),
+    0 3px 6px rgba(10, 6, 3, 0.16),
+    0 14px 30px -6px rgba(10, 6, 3, 0.45);
+  pointer-events: none;
+}
+
+.seal-piece--whole {
+  z-index: 6;
+}
+
+/* Put the letter back in its envelope. Quiet until wanted. */
+.close-letter {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(240, 230, 212, 0.62);
+  cursor: pointer;
+  transition: color 250ms ease, background-color 250ms ease;
+  animation: close-in 900ms 400ms ease both;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close-letter svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.close-letter:hover {
+  color: rgba(250, 244, 232, 0.95);
+  background: rgba(255, 248, 235, 0.06);
+}
+
+.close-letter:focus-visible {
+  outline: 2px solid rgba(240, 228, 206, 0.85);
+  outline-offset: 2px;
+  color: rgba(250, 244, 232, 0.95);
+}
+
+@keyframes close-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .close-letter {
+    animation: none;
+  }
+}
